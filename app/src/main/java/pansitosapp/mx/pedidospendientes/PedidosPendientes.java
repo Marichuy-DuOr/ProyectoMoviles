@@ -1,4 +1,4 @@
-package pansitosapp.mx.perfilusuario;
+package pansitosapp.mx.pedidospendientes;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,7 +11,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -28,33 +28,38 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import pansitosapp.mx.R;
 import pansitosapp.mx.http.Client;
 import pansitosapp.mx.http.Node;
-import pansitosapp.mx.productos.Pan;
-import pansitosapp.mx.productos.PanAdapter;
-import pansitosapp.mx.productos.Productos;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PerfilUsuario extends Fragment {
+public class PedidosPendientes extends Fragment implements PedidoInterface {
 
-    private NavController navController; //para navegar entre fragmentos
-
+    private NavController navController;
     ProgressDialog progress;
 
-    TextView textNombre, textEmail;
+    private RecyclerView recyclerPedidos;
+    PedidoAdapter pedidoAdapter;
+
+    ArrayList<Pedido> listaPedidos;
+
+    Integer argumento;
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.perfil_usuario, container, false); // Cambiar el layout que corresponda
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true); // flecha para regresar al menu
+        View root = inflater.inflate(R.layout.pedidos_pendientes, container, false);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+
+        argumento = getArguments().getInt("elEstado");
+
         return root;
     }
 
@@ -63,19 +68,16 @@ public class PerfilUsuario extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
 
-        textNombre = (TextView) view.findViewById(R.id.txtNombre);
-        textEmail = (TextView) view.findViewById(R.id.txtEmail);
-
-        getUser();
+        getAllPedidos();
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) { //agregar cuando pongas opciones en el menu
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) { // para que el boton de la flecha funcione
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             ((AppCompatActivity)getActivity()).onBackPressed();
@@ -84,18 +86,20 @@ public class PerfilUsuario extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void getUser () {
+    private void getAllPedidos () {
         Client userRest = Node.getClient().create(Client.class);
+
         progress = ProgressDialog.show(getContext(), "Cargando","Espera", true);
+
         SharedPreferences preferences = getActivity().getSharedPreferences("Usuario", Context.MODE_PRIVATE);
         String token = preferences.getString("token","No existe la informacion");
 
-        final Call<JsonObject> call = userRest.getelUsuario(token);
+        final Call<JsonObject> call = userRest.getAllPedidosActivos(token, argumento);
         call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) { // cuando recibe la respuesta del servidor
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 
-                progress.dismiss(); // cerrar el progress dialog
+                progress.dismiss();
                 if (response.code() != 200) {
                     JSONObject jObjError = null;
                     try {
@@ -109,20 +113,40 @@ public class PerfilUsuario extends Fragment {
                         e.printStackTrace();
                     }
                 }
+                listaPedidos = new ArrayList<>();
 
                 JsonObject json = response.body();
-                json.toString();
                 JsonArray jsonArray = json.getAsJsonArray("array");
+                for (int i=0; i < jsonArray.size(); i++){
 
-                JsonObject object = jsonArray.get(0).getAsJsonObject();
+                    JsonObject object = jsonArray.get(i).getAsJsonObject();
+                    Integer id = object.getAsJsonPrimitive("id").getAsInt();
+                    Integer id_usuario = object.getAsJsonPrimitive("id_usuario").getAsInt();
+                    String nombre = object.getAsJsonPrimitive("nombre").getAsString();
+                    String fecha = object.getAsJsonPrimitive("fecha").getAsString();
+                    Float total = object.getAsJsonPrimitive("total").getAsFloat();
+                    Double lat = object.getAsJsonPrimitive("lat").getAsDouble();
+                    Double lon = object.getAsJsonPrimitive("lon").getAsDouble();
+                    Integer estado = object.getAsJsonPrimitive("estado").getAsInt();
 
-                String nombre = object.getAsJsonPrimitive("nombre").getAsString();
-                String email = object.getAsJsonPrimitive("email").getAsString();
+                    fecha = fecha.replace("T", " ");
+                    fecha = fecha.substring(0, 16);
 
-                textNombre.setText(nombre);
-                textEmail.setText(email);
+
+                    Pedido pedido = new Pedido(id, id_usuario, nombre, fecha, total, lat, lon, estado);
+                    listaPedidos.add(pedido);
+                }
+
+                recyclerPedidos = getView().findViewById(R.id.recyclerid);
+                recyclerPedidos.setLayoutManager(new LinearLayoutManager(getContext()));
+
+                pedidoAdapter =  new PedidoAdapter(listaPedidos);
+
+                recyclerPedidos.setAdapter(pedidoAdapter);
+                pedidoAdapter.setOnClick(PedidosPendientes.this);
 
             }
+
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 progress.dismiss();
@@ -130,4 +154,12 @@ public class PerfilUsuario extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onPedidoClick(int pos) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("elPedido", listaPedidos.get(pos) );
+        navController.navigate(R.id.nav_to_pedido_detalles, bundle);
+    }
+
 }

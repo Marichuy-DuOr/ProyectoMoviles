@@ -7,47 +7,41 @@
     tools:context=".clientmenu.ClientMenu"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/txtMessage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Cliente"
-        android:layout_marginBottom="30dp"
-        android:textSize="25dp"/>
-
     <androidx.cardview.widget.CardView
+        android:id="@+id/opcion1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/cv">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
+            android:padding="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:layout_height="wrap_content">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/person_photo"
+                android:id="@+id/img_opcion1"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginRight="16dp"/>
+                android:layout_marginRight="16dp"
+                android:src="@drawable/muffin"/>
 
             <TextView
+                android:id="@+id/name_opcion1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/person_name"
-                android:layout_toRightOf="@+id/person_photo"
+                android:layout_toRightOf="@+id/img_opcion1"
                 android:layout_alignParentTop="true"
-                android:textSize="30sp"/>
+                android:textSize="30sp"
+                android:text="Mapa"/>
 
             <TextView
+                android:id="@+id/desc_opcion1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/person_age"
-                android:layout_toRightOf="@+id/person_photo"
-                android:layout_below="@+id/person_name"/>
+                android:layout_toRightOf="@+id/img_opcion1"
+                android:layout_below="@+id/name_opcion1"
+                android:text="Ver si funciona el mapa"/>
 
         </RelativeLayout>
 

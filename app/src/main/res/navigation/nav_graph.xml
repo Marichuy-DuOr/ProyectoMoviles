@@ -44,6 +44,9 @@
         <action
             android:id="@+id/nav_to_perfil_usuario"
             app:destination="@id/nav_perfil_usuario" />
+        <action
+            android:id="@+id/nav_to_mapa"
+            app:destination="@id/nav_mapa" />
     </fragment>
 
     <fragment
@@ -60,6 +63,9 @@
         <action
             android:id="@+id/nav_to_productos"
             app:destination="@id/nav_productos" />
+        <action
+            android:id="@+id/nav_to_pedidos_pendientes"
+            app:destination="@id/nav_pedidos_pendientes" />
     </fragment>
 
     <fragment
@@ -87,5 +93,42 @@
             android:id="@+id/nav_to_productos"
             app:destination="@id/nav_productos" />
 
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_mapa"
+        android:name="pansitosapp.mx.mapa.Mapa"
+        android:label="Mapa"
+        tools:layout="@layout/mapa">
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_pedidos_pendientes"
+        android:name="pansitosapp.mx.pedidospendientes.PedidosPendientes"
+        android:label="Pedidos"
+        tools:layout="@layout/pedidos_pendientes">
+        <action
+            android:id="@+id/nav_to_pedido_detalles"
+            app:destination="@id/nav_pedido_detalles" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_pedido_detalles"
+        android:name="pansitosapp.mx.pedidodetalles.PedidoDetalles"
+        android:label="Detalles"
+        tools:layout="@layout/pedido_detalles">
+        <action
+            android:id="@+id/nav_to_pedidos_pendientes"
+            app:destination="@id/nav_pedidos_pendientes" />
+        <action
+            android:id="@+id/nav_to_mapa_entrega"
+            app:destination="@id/nav_mapa_entrega" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_mapa_entrega"
+        android:name="pansitosapp.mx.mapaentrega.MapaEntrega"
+        android:label="Entrega"
+        tools:layout="@layout/mapa_entrega">
     </fragment>
 </navigation>
