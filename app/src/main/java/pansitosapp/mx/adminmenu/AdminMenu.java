@@ -27,7 +27,8 @@ public class AdminMenu extends Fragment implements View.OnClickListener {
     private NavController navController;
     String usuarioNombre;
 
-    CardView opc1;
+    CardView opc1, opc2, opc3;
+    Bundle bundle;
 
     @Override
     public View onCreateView(
@@ -49,6 +50,12 @@ public class AdminMenu extends Fragment implements View.OnClickListener {
 
         opc1 = view.findViewById(R.id.opcion1);
         opc1.setOnClickListener(this);
+        opc2 = view.findViewById(R.id.opcion2);
+        opc2.setOnClickListener(this);
+        opc3 = view.findViewById(R.id.opcion3);
+        opc3.setOnClickListener(this);
+
+        bundle = new Bundle();
     }
 
     @Override
@@ -56,6 +63,14 @@ public class AdminMenu extends Fragment implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.opcion1:
                 navController.navigate(R.id.nav_to_productos); // opciones de los productos registrados
+                break;
+            case R.id.opcion2:
+                bundle.putInt("elEstado", 0);
+                navController.navigate(R.id.nav_to_pedidos_pendientes, bundle);
+                break;
+            case R.id.opcion3:
+                bundle.putInt("elEstado", 1);
+                navController.navigate(R.id.nav_to_pedidos_pendientes, bundle);
                 break;
         }
     }

@@ -26,7 +26,7 @@ public class PanAdapter extends RecyclerView.Adapter<PanAdapter.PanViewHolder>{
     @Override
     public PanViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // poner el view que se va a reciclar
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_card,null,false);
+        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_card,parent,false);
         return new PanViewHolder(view);
     }
 

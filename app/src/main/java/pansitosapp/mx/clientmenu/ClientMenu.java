@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -27,6 +28,8 @@ public class ClientMenu  extends Fragment implements View.OnClickListener {
     // Hace basicamente lo mismo que el AdminMenu pero con las opciones del Cliente
     private NavController navController;
     String usuarioNombre;
+
+    CardView opc1;
 
     @Override
     public View onCreateView(
@@ -46,16 +49,17 @@ public class ClientMenu  extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
 
-
+        opc1 = view.findViewById(R.id.opcion1);
+        opc1.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        /*switch (view.getId()) {
-            case R.id.btnLogout:
-                logout();
+        switch (view.getId()) {
+            case R.id.opcion1:
+                navController.navigate(R.id.nav_to_mapa);
                 break;
-        }*/
+        }
     }
 
     private void cargarPreferencias(){

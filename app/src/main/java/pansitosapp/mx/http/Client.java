@@ -19,6 +19,9 @@ public interface Client {
     @POST("register")
     Call<JsonObject> onRegister(@Body JsonObject data);
 
+    @GET("elUsuario")
+    Call<JsonObject> getelUsuario(@Header("user_token") String token);
+
     @GET("productos")
     Call<JsonObject> getAllProductos(@Header("user_token") String token);
 
@@ -33,5 +36,14 @@ public interface Client {
 
     @PUT("producto")
     Call<JsonObject> modifyProducto(@Header("user_token") String token, @Body JsonObject data);
+
+    @GET("pedidosActivos/{estado}")
+    Call<JsonObject> getAllPedidosActivos(@Header("user_token") String token, @Path("estado") Integer estado);
+
+    @GET("detalles/{id}")
+    Call<JsonObject> getDetalles(@Header("user_token") String token, @Path("id") Integer id);
+
+    @PUT("completarPedido")
+    Call<JsonObject> completarPedido(@Header("user_token") String token, @Body JsonObject data);
 
 }

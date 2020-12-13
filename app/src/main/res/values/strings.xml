@@ -7,4 +7,7 @@
     <string name="btn_guardar">Guardar</string>
     <string name="btn_eliminar">Eliminar</string>
     <string name="btn_nuevo">Nuevo</string>
+    <string name="btn_completada">Finalizar pedido</string>
+    <string name="btn_mapa_entrega">Mapa de entrega</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAL01P8IiLBIRxWMX25woo7RC6KVJFKgYA</string>
 </resources>
