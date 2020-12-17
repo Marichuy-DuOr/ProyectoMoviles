@@ -29,7 +29,7 @@ public class ClientMenu  extends Fragment implements View.OnClickListener {
     private NavController navController;
     String usuarioNombre;
 
-    CardView opc1;
+    CardView opc1, opc2;
 
     @Override
     public View onCreateView(
@@ -51,13 +51,18 @@ public class ClientMenu  extends Fragment implements View.OnClickListener {
 
         opc1 = view.findViewById(R.id.opcion1);
         opc1.setOnClickListener(this);
+        opc2 = view.findViewById(R.id.opcion2);
+        opc2.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.opcion1:
-                navController.navigate(R.id.nav_to_mapa);
+                navController.navigate(R.id.nav_to_mostrarproductos);
+                break;
+            case R.id.opcion2:
+                navController.navigate(R.id.nav_to_carrito);
                 break;
         }
     }

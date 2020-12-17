@@ -1,10 +1,11 @@
-package pansitosapp.mx.productos;
+package pansitosapp.mx.mostrarproductos;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,23 +41,22 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Productos extends Fragment implements PanInterface, View.OnClickListener {
+public class MostrarProductos extends Fragment implements PancitoInterface, View.OnClickListener{
 
     private NavController navController; // control para navegar entre componentes
     ProgressDialog progress;
 
     private RecyclerView recyclerPanes;
-    PanAdapter panAdapter;
+    PancitoAdapter panAdapter;
 
-    ArrayList<Pan> listaPanes; // lista con todos los panes
+    ArrayList<Pancito> listaPanes; // lista con todos los panes
 
-    FloatingActionButton addPan; // boton para crear un producto nuevo
     Button regresar;
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.productos, container, false); // Cambiar el layout que corresponda
+        View root = inflater.inflate(R.layout.mostrarproductos, container, false); // Cambiar el layout que corresponda
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true); // flecha para regresar al menu
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
@@ -67,14 +68,19 @@ public class Productos extends Fragment implements PanInterface, View.OnClickLis
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
 
-        addPan = view.findViewById(R.id.btnNuevo);
-        addPan.setOnClickListener(this);
-
         regresar = view.findViewById(R.id.btnRegresar);
         regresar.setOnClickListener(this);
 
         getAllProductos(); // llena el array de panes
 
+    }
+
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnRegresar:
+                navController.navigate(R.id.nav_to_client_menu);
+                break;
+        }
     }
 
     @Override
@@ -92,17 +98,6 @@ public class Productos extends Fragment implements PanInterface, View.OnClickLis
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btnNuevo:
-                navController.navigate(R.id.nav_to_edit_productos); // lo lleva a crear un producto nuevo
-                break;
-            case R.id.btnRegresar:
-                navController.navigate(R.id.nav_to_admin_menu);
-                break;
-        }
-    }
 
     private void getAllProductos () {
         Client userRest = Node.getClient().create(Client.class); // declara la clase para las peticiones al servidor
@@ -151,18 +146,18 @@ public class Productos extends Fragment implements PanInterface, View.OnClickLis
                     String imagen = object.getAsJsonPrimitive("imagen").getAsString();
                     String descripcion = object.getAsJsonPrimitive("descripcion").getAsString();
 
-                    Pan pan = new Pan(id, nombre, precio, imagen, descripcion); // crea un objeto Pan
+                    Pancito pan = new Pancito(id, nombre, precio, imagen, descripcion); // crea un objeto Pan
                     listaPanes.add(pan); // lo agrega a la lista
                 }
 
                 // Cuando ya estan todos los panes en el array list manejamos el recycledView para mostrarlos todos
-                recyclerPanes = getView().findViewById(R.id.recyclerid); //obtiene el id de xml
+                recyclerPanes = getView().findViewById(R.id.recyclerId); //obtiene el id de xml
                 recyclerPanes.setLayoutManager(new LinearLayoutManager(getContext()));
                 // declara el adapter que es el que maneja el otro xml que se va a reciclar y le manda el array de panes
-                panAdapter =  new PanAdapter(listaPanes);
+                panAdapter =  new PancitoAdapter(listaPanes);
 
                 recyclerPanes.setAdapter(panAdapter); // le asignas el adapter al recyclerView
-                panAdapter.setOnClick(Productos.this); // Agrega click listener
+                panAdapter.setOnClick(MostrarProductos.this); // Agrega click listener
 
             }
 
@@ -179,7 +174,8 @@ public class Productos extends Fragment implements PanInterface, View.OnClickLis
         // lo dirijo al fragmento para editar panes con el pan como parametro para modificarlo
         Bundle bundle = new Bundle();
         bundle.putSerializable("elPan", listaPanes.get(pos) );
-        navController.navigate(R.id.nav_to_edit_productos, bundle);
+        navController.navigate(R.id.nav_to_agregarproducto, bundle);
     }
+
 
 }

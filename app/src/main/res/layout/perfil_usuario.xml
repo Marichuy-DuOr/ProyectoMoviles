@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:textStyle="bold"
         android:text="Perfil Usuario"
         android:textSize="25dp"/>
 
@@ -20,6 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="María Guadalupe Lopez Hernández"
+        android:textAlignment="center"
         android:layout_margin="15dp"
         android:textSize="20dp"/>
 
@@ -28,6 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="lupita@gmail.com"
+        android:textAlignment="center"
         android:layout_margin="15dp"
         android:textSize="20dp"/>
 

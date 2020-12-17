@@ -23,7 +23,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button2"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/button_rounded"
+        android:textColor="@android:color/white"/>
 
     <Button android:id="@+id/button2"
         android:layout_width="wrap_content"
@@ -32,12 +34,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button3"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/button1" />
+        app:layout_constraintStart_toEndOf="@+id/button1"
+        android:background="@drawable/button_rounded"
+        android:textColor="@android:color/white"/>
 
-    <Button android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Imprimir coordenadas"
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="155dp"
+        android:layout_height="48dp"
+        android:background="@drawable/button_rounded"
+        android:text="Finalizar Compra"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

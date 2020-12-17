@@ -42,7 +42,8 @@
                 android:textSize="20sp"
                 android:text="5"
                 android:background="@drawable/ic_baseline_brightness_1_24"
-                android:backgroundTint="#c8a2c8"/>
+                android:textColor="@color/white"
+                android:backgroundTint="#F13535"/>
 
         </FrameLayout>
 

@@ -1,8 +1,12 @@
 package pansitosapp.mx.mapa;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,8 +31,23 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 import pansitosapp.mx.R;
+import pansitosapp.mx.carrito.Carrito;
+import pansitosapp.mx.http.Client;
+import pansitosapp.mx.http.Node;
+import pansitosapp.mx.mostrarproductos.Pancito;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Mapa extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, View.OnClickListener{
 
@@ -44,6 +64,12 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleMap.OnMa
     double lat = 21.8835868;
     double lon = -102.2913539;
 
+
+    ArrayList<Carrito> carrito;
+
+    String token;
+    Float total = new Float(0);
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,6 +77,10 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleMap.OnMa
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+
+        carrito = (ArrayList<Carrito>) getArguments().getSerializable("elCarrito");
+
+
         return root;
     }
 
@@ -58,6 +88,9 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleMap.OnMa
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
+
+        SharedPreferences preferences = getActivity().getSharedPreferences("Usuario", Context.MODE_PRIVATE);
+        token = preferences.getString("token","No existe la informacion");
 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapa);
         mapFragment.getMapAsync(this);
@@ -132,8 +165,141 @@ public class Mapa extends Fragment implements OnMapReadyCallback, GoogleMap.OnMa
                 //mapa.moveCamera(CameraUpdateFactory.newLatLng(UPV)); // lo mismo que la de arriba pero sin animación
                 break;
             case R.id.button3:
-                System.out.println("Lat-> " + lat + " Lon-> " + lon);
+                registrarPedido();
+                navController.navigate(R.id.nav_to_client_menu);
                 break;
         }
+    }
+
+    private void registrarPedido (){
+
+        for (int i=0; i < carrito.size(); i++) {
+            total += carrito.get(i).getPrecio() * carrito.get(i).getCantidad();
+        }
+        Client userRest = Node.getClient().create(Client.class); // declara la clase de las peticiones al servidor
+
+        JsonObject data = new JsonObject(); // declara un objeto json para el body
+        data.addProperty("total", total);
+        data.addProperty("lat", lat);
+        data.addProperty("lon", lon);
+
+        // inicia el progress dialog en lo que se guarda el objeto
+
+        // hace la peticion al servidor con el token y el body
+        final Call<JsonObject> call = userRest.createPedido(token, data);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.code() != 200) {
+                    JSONObject jObjError = null;
+                    try {
+                        jObjError = new JSONObject(response.errorBody().string());
+                        Log.i("mainActivity", jObjError.toString());
+                        System.out.println(jObjError.toString());
+                        return;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+                JsonObject json = response.body();
+                JsonObject object = json.getAsJsonObject("array");
+
+                // JsonObject object = jsonArray.get(0).getAsJsonObject();
+                Integer id = object.getAsJsonPrimitive("insertId").getAsInt();
+                registrarProdPedido(id);
+                deleteCarrito();
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                call.cancel();
+            }
+        });
+    }
+
+    private void registrarProdPedido(Integer id_pedido){
+        for (int i=0; i < carrito.size(); i++) {
+            Client userRest = Node.getClient().create(Client.class); // declara la clase de las peticiones al servidor
+
+            JsonObject data = new JsonObject(); // declara un objeto json para el body
+            data.addProperty("id_producto", carrito.get(i).getId_producto());
+            data.addProperty("cantidad", carrito.get(i).getCantidad());
+            data.addProperty("precio", carrito.get(i).getPrecio());
+            data.addProperty("id_pedido", id_pedido);
+
+            // hace la peticion al servidor con el token y el body
+            final Call<JsonObject> call = userRest.createProductoPedido(token, data);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (response.code() != 200) {
+                        JSONObject jObjError = null;
+                        try {
+                            jObjError = new JSONObject(response.errorBody().string());
+                            Log.i("mainActivity", jObjError.toString());
+                            System.out.println(jObjError.toString());
+                            return;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    JsonObject json = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    call.cancel();
+                }
+            });
+        }
+    }
+
+    private void deleteCarrito() {
+        Client userRest = Node.getClient().create(Client.class); // declara la clase de peticiones al servidor
+
+        // progress dialog para cuando se elimina algo
+
+        progress = ProgressDialog.show(getContext(), "Procesando","Espera", true);
+        // manda la peticion al servidor, le manda el token y el id del pan
+        final Call<JsonObject> call = userRest.deleteAllCarrito(token);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                progress.dismiss(); // cierra el progress dialog
+                if (response.code() != 200) {
+                    JSONObject jObjError = null;
+                    try {
+                        jObjError = new JSONObject(response.errorBody().string());
+                        Log.i("mainActivity", jObjError.toString());
+                        System.out.println(jObjError.toString());
+                        return;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Pedido realizado" , Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER_VERTICAL,0,0);
+                toast.show();
+                // cuando se borra el producto lo regresa al fragmento de todos los productos
+                JsonObject json = response.body();
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                progress.dismiss(); // cierralo aqui tambien
+                call.cancel();
+            }
+        });
     }
 }

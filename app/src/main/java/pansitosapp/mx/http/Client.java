@@ -46,4 +46,24 @@ public interface Client {
     @PUT("completarPedido")
     Call<JsonObject> completarPedido(@Header("user_token") String token, @Body JsonObject data);
 
+    @POST("carrito")
+    Call<JsonObject> createCarrito(@Header("user_token") String token, @Body JsonObject data);
+
+    @GET("carrito")
+    Call<JsonObject> getAllCarrito(@Header("user_token") String token);
+
+    @PUT("carrito")
+    Call<JsonObject> updateCarrito(@Header("user_token") String token, @Body JsonObject data);
+
+    @DELETE("carrito/{id}")
+    Call<JsonObject> deleteCarrito(@Header("user_token") String token, @Path("id") Integer id);
+
+    @DELETE("carrito")
+    Call<JsonObject> deleteAllCarrito(@Header("user_token") String token);
+
+    @POST("pedido")
+    Call<JsonObject> createPedido(@Header("user_token") String token, @Body JsonObject data);
+
+    @POST("pedidoProducto")
+    Call<JsonObject> createProductoPedido(@Header("user_token") String token, @Body JsonObject data);
 }

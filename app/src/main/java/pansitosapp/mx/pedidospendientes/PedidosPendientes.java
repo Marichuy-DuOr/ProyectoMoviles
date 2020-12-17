@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PedidosPendientes extends Fragment implements PedidoInterface {
+public class PedidosPendientes extends Fragment implements PedidoInterface, View.OnClickListener {
 
     private NavController navController;
     ProgressDialog progress;
@@ -49,6 +50,7 @@ public class PedidosPendientes extends Fragment implements PedidoInterface {
     ArrayList<Pedido> listaPedidos;
 
     Integer argumento;
+    Button regresar;
 
     @Override
     public View onCreateView(
@@ -68,7 +70,19 @@ public class PedidosPendientes extends Fragment implements PedidoInterface {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
 
+        regresar = view.findViewById(R.id.btnRegresar);
+        regresar.setOnClickListener(this);
+
         getAllPedidos();
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnRegresar:
+                navController.navigate(R.id.nav_to_admin_menu);
+                break;
+        }
     }
 
     @Override
